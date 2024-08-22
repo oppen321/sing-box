@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 定义下载URL前缀和目标目录
-BASE_URL="https://github.com/SagerNet/sing-box/releases/latest/download"
-DEST_DIR="/root"
+BASE_URL="https://github.com/SagerNet/sing-box/releases/download"
+DEST_DIR="/root/sing-box"
 BIN_DIR="/usr/bin"
 SERVICE_FILE="/etc/systemd/system/sing-box.service"
 CONFIG_DIR="/etc/sing-box"
@@ -12,19 +12,20 @@ CONFIG_FILE="$CONFIG_DIR/config.json"
 CONVERT_BASE_URL="https://singbox.woaiboluo.monster/config/"
 CONVERT_FILE_PARAM="&file=https:/github.com/Toperlock/sing-box-subscribe/raw/main/config_template/config_template_groups_rule_set_tun_fakeip.json"
 
-# 检测设备架构
+# 设置版本号和架构
+SING_BOX_VERSION="1.9.4"  # 设置版本号
 ARCH=$(uname -m)
 
 # 根据架构选择下载文件
 case $ARCH in
   x86_64)
-    FILE="sing-box-linux-amd64.tar.gz"
+    ARCH="amd64"
     ;;
   aarch64)
-    FILE="sing-box-linux-arm64.tar.gz"
+    ARCH="arm64"
     ;;
   armv7l)
-    FILE="sing-box-linux-armv7.tar.gz"
+    ARCH="armv7"
     ;;
   *)
     echo "不支持的架构: $ARCH"
@@ -32,21 +33,30 @@ case $ARCH in
     ;;
 esac
 
+# 定义下载文件名
+FILE="sing-box-$SING_BOX_VERSION-linux-$ARCH.tar.gz"
+
+# 创建目标目录
+mkdir -p "$DEST_DIR"
+
 # 下载sing-box二进制文件
 echo "正在下载 $FILE..."
-mkdir -p "$DEST_DIR"
-curl -L -o "$DEST_DIR/singbox.tar" "$BASE_URL/$FILE"
+wget -O "$DEST_DIR/singbox.tar.gz" "$BASE_URL/v$SING_BOX_VERSION/$FILE"
 
 # 为下载的文件赋予777权限
-chmod 777 "$DEST_DIR/singbox.tar"
+chmod 777 "$DEST_DIR/singbox.tar.gz"
 
 # 解压文件
 echo "正在解压文件..."
-tar -zxf "$DEST_DIR/singbox.tar" -C "$DEST_DIR"
+tar -zxf "$DEST_DIR/singbox.tar.gz" -C "$DEST_DIR"
+
+# 创建解压目录
+EXTRACTED_DIR="$DEST_DIR/sing-box-$SING_BOX_VERSION-linux-$ARCH"
+mkdir -p "$EXTRACTED_DIR"
 
 # 将解压后的二进制文件移动到/usr/bin目录
 echo "正在移动二进制文件到 $BIN_DIR..."
-mv "$DEST_DIR/sing-box" "$BIN_DIR/sing-box"
+mv "$EXTRACTED_DIR/sing-box" "$BIN_DIR/sing-box"
 
 # 为二进制文件添加可执行权限
 chmod +x "$BIN_DIR/sing-box"
@@ -110,7 +120,7 @@ EOL
 echo "重新加载systemd服务..."
 systemctl daemon-reload
 
-# 启用sing-box服务，但暂不启动
+# 启用sing-box服务
 echo "启用sing-box服务..."
 systemctl enable sing-box.service
 
