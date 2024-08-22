@@ -61,6 +61,17 @@ else
   exit 1
 fi
 
+# 获取本机IP地址
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+
+# 将配置文件中的127.0.0.1替换为本机IP地址
+sed -i "s/127.0.0.1/$LOCAL_IP/g" "$CONFIG_FILE"
+
+# 启用IP转发
+echo "启用IP转发..."
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
 # 创建或更新systemd服务文件
 echo "创建或更新sing-box服务文件..."
 cat <<EOL > $SERVICE_FILE
