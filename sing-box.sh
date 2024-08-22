@@ -35,14 +35,14 @@ esac
 # 下载sing-box二进制文件
 echo "正在下载 $FILE..."
 mkdir -p "$DEST_DIR"
-curl -L -o "$DEST_DIR/$FILE" "$BASE_URL/$FILE"
+curl -L -o "$DEST_DIR/singbox.tar" "$BASE_URL/$FILE"
 
 # 为下载的文件赋予777权限
-chmod 777 "$DEST_DIR/$FILE"
+chmod 777 "$DEST_DIR/singbox.tar"
 
 # 解压文件
 echo "正在解压文件..."
-tar -zxf "$DEST_DIR/$FILE" -C "$DEST_DIR"
+tar -zxf "$DEST_DIR/singbox.tar" -C "$DEST_DIR"
 
 # 将解压后的二进制文件移动到/usr/bin目录
 echo "正在移动二进制文件到 $BIN_DIR..."
