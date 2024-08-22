@@ -84,6 +84,9 @@ else
   exit 1
 fi
 
+# 为配置文件赋予777权限
+chmod 777 "$CONFIG_FILE"
+
 # 获取本机IP地址
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
