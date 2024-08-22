@@ -2,7 +2,8 @@
 
 # 定义下载URL前缀和目标目录
 BASE_URL="https://github.com/SagerNet/sing-box/releases/latest/download"
-DEST_DIR="/usr/bin"
+DEST_DIR="/tmp/sing-box"
+BIN_DIR="/usr/bin"
 SERVICE_FILE="/etc/systemd/system/sing-box.service"
 CONFIG_DIR="/etc/sing-box"
 CONFIG_FILE="$CONFIG_DIR/config.json"
@@ -17,13 +18,13 @@ ARCH=$(uname -m)
 # 根据架构选择下载文件
 case $ARCH in
   x86_64)
-    FILE="sing-box-linux-amd64"
+    FILE="sing-box-linux-amd64.zip"
     ;;
   aarch64)
-    FILE="sing-box-linux-arm64"
+    FILE="sing-box-linux-arm64.zip"
     ;;
   armv7l)
-    FILE="sing-box-linux-armv7"
+    FILE="sing-box-linux-armv7.zip"
     ;;
   *)
     echo "不支持的架构: $ARCH"
@@ -33,10 +34,19 @@ esac
 
 # 下载sing-box二进制文件
 echo "正在下载 $FILE..."
-curl -L -o "$DEST_DIR/sing-box" "$BASE_URL/$FILE"
+mkdir -p "$DEST_DIR"
+curl -L -o "$DEST_DIR/$FILE" "$BASE_URL/$FILE"
 
-# 为文件添加可执行权限
-chmod +x "$DEST_DIR/sing-box"
+# 使用unzip解压文件
+echo "正在解压文件..."
+unzip "$DEST_DIR/$FILE" -d "$DEST_DIR"
+
+# 将解压后的二进制文件移动到/usr/bin目录
+echo "正在移动二进制文件到 $BIN_DIR..."
+mv "$DEST_DIR/sing-box" "$BIN_DIR/sing-box"
+
+# 为二进制文件添加可执行权限
+chmod +x "$BIN_DIR/sing-box"
 
 # 确保配置目录存在
 if [ ! -d "$CONFIG_DIR" ]; then
