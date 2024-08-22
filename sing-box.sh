@@ -2,7 +2,7 @@
 
 # 定义下载URL前缀和目标目录
 BASE_URL="https://github.com/SagerNet/sing-box/releases/latest/download"
-DEST_DIR="/tmp/sing-box"
+DEST_DIR="/root"
 BIN_DIR="/usr/bin"
 SERVICE_FILE="/etc/systemd/system/sing-box.service"
 CONFIG_DIR="/etc/sing-box"
@@ -18,13 +18,13 @@ ARCH=$(uname -m)
 # 根据架构选择下载文件
 case $ARCH in
   x86_64)
-    FILE="sing-box-linux-amd64.zip"
+    FILE="sing-box-linux-amd64.tar.gz"
     ;;
   aarch64)
-    FILE="sing-box-linux-arm64.zip"
+    FILE="sing-box-linux-arm64.tar.gz"
     ;;
   armv7l)
-    FILE="sing-box-linux-armv7.zip"
+    FILE="sing-box-linux-armv7.tar.gz"
     ;;
   *)
     echo "不支持的架构: $ARCH"
@@ -37,9 +37,12 @@ echo "正在下载 $FILE..."
 mkdir -p "$DEST_DIR"
 curl -L -o "$DEST_DIR/$FILE" "$BASE_URL/$FILE"
 
-# 使用unzip解压文件
+# 为下载的文件赋予777权限
+chmod 777 "$DEST_DIR/$FILE"
+
+# 解压文件
 echo "正在解压文件..."
-unzip "$DEST_DIR/$FILE" -d "$DEST_DIR"
+tar -zxvf "$DEST_DIR/$FILE" -C "$DEST_DIR"
 
 # 将解压后的二进制文件移动到/usr/bin目录
 echo "正在移动二进制文件到 $BIN_DIR..."
@@ -103,11 +106,22 @@ LimitNOFILE=infinity
 WantedBy=multi-user.target
 EOL
 
-# 重新加载systemd服务并启用sing-box
-echo "重新加载systemd服务并启用sing-box..."
+# 重新加载systemd服务
+echo "重新加载systemd服务..."
 systemctl daemon-reload
+
+# 启用sing-box服务，但暂不启动
+echo "启用sing-box服务..."
 systemctl enable sing-box.service
-systemctl start sing-box.service
+
+# 提示用户是否立即启动服务
+read -p "是否现在启动sing-box服务？(y/n): " START_NOW
+if [ "$START_NOW" == "y" ]; then
+  systemctl start sing-box.service
+  echo "sing-box服务已启动。"
+else
+  echo "sing-box服务已启用，但尚未启动。"
+fi
 
 # 显示完成信息
-echo "sing-box安装、配置及订阅导入已完成，服务已启动。"
+echo "sing-box安装、配置及订阅导入已完成。"
