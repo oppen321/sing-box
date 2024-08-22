@@ -42,7 +42,7 @@ chmod 777 "$DEST_DIR/$FILE"
 
 # 解压文件
 echo "正在解压文件..."
-tar -zxvf "$DEST_DIR/$FILE" -C "$DEST_DIR"
+tar -zxf "$DEST_DIR/$FILE" -C "$DEST_DIR"
 
 # 将解压后的二进制文件移动到/usr/bin目录
 echo "正在移动二进制文件到 $BIN_DIR..."
