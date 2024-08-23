@@ -91,7 +91,7 @@ chmod 777 "$CONFIG_FILE"
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
 # 将配置文件中的127.0.0.1替换为本机IP地址
-sed -i "s/127.0.0.1/$LOCAL_IP/g" "$CONFIG_FILE"
+sed -i "s/\"external_controller\": \"127.0.0.1:9090\"/\"external_controller\": \"$LOCAL_IP:9090\"/g" "$CONFIG_FILE"
 
 # 启用IP转发
 echo "启用IP转发..."
