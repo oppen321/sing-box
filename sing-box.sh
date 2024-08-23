@@ -4,9 +4,9 @@
 BASE_URL="https://github.com/SagerNet/sing-box/releases/download"
 DEST_DIR="/root/sing-box"
 BIN_DIR="/usr/bin"
-SERVICE_FILE="/etc/systemd/system/sing-box@tun.service"
+SERVICE_FILE="/etc/systemd/system/sing-box.service"
 CONFIG_DIR="/etc/sing-box"
-CONFIG_FILE="$CONFIG_DIR/tun.json"
+CONFIG_FILE="$CONFIG_DIR/config.json"
 
 # 定义订阅转换基础URL
 CONVERT_BASE_URL="https://singbox.woaiboluo.monster/config/"
@@ -97,15 +97,16 @@ sed -i "s/\"external_controller\": \"127.0.0.1:9090\"/\"external_controller\": \
 # 创建或更新systemd服务文件
 echo "创建或更新sing-box服务文件..."
 cat <<EOL > $SERVICE_FILE
+cat <<EOF> /etc/systemd/system/sing-box.service
 [Unit]
 Description=sing-box service
 Documentation=https://sing-box.sagernet.org
-After=network.target nss-lookup.target network-online.target
+After=network.target nss-lookup.target
 
 [Service]
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_SYS_PTRACE CAP_DAC_READ_SEARCH
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_SYS_PTRACE CAP_DAC_READ_SEARCH
-ExecStart=/usr/bin/sing-box -D /var/lib/sing-box-%i -c /etc/sing-box/%i.json run
+ExecStart=/usr/bin/sing-box -D /var/lib/sing-box -C /etc/sing-box run
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=10s
@@ -113,6 +114,7 @@ LimitNOFILE=infinity
 
 [Install]
 WantedBy=multi-user.target
+EOF
 EOL
 
 # 重新加载systemd服务
@@ -120,16 +122,16 @@ echo "重新加载systemd服务..."
 systemctl daemon-reload
 
 # 启用sing-box服务
-echo "启用sing-box@tun.service..."
-systemctl enable sing-box@tun.service
+echo "启用sing-box.service..."
+systemctl enable sing-box.service
 
 # 提示用户是否立即启动服务
-read -p "是否现在启动sing-box@tun.service？(y/n): " START_NOW
+read -p "是否现在启动sing-box.service？(y/n): " START_NOW
 if [ "$START_NOW" == "y" ]; then
   systemctl start sing-box@tun.service
-  echo "sing-box@tun.service 服务已启动。"
+  echo "sing-box.service 服务已启动。"
 else
-  echo "sing-box@tun.service 服务已启用，但尚未启动。"
+  echo "sing-box.service 服务已启用，但尚未启动。"
 fi
 
 # 启用IP转发
