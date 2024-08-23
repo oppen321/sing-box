@@ -83,11 +83,11 @@ fi
 # 为配置文件赋予权限
 chmod 777 "$CONFIG_FILE"
 
-# 获取本机 IP 地址
+# 获取本机IP地址
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
-# 将配置文件中的 "external_controller": "192.168.100.244:9090" 替换为本机 IP 地址
-sed -i "s/\"external_controller\": \"192.168.100.244:9090\"/\"external_controller\": \"$LOCAL_IP:9090\"/g" "$CONFIG_FILE"
+# 将配置文件中的127.0.0.1替换为本机IP地址
+sed -i "s/\"external_controller\": \"127.0.0.1:9090\"/\"external_controller\": \"$LOCAL_IP:9090\"/g" "$CONFIG_FILE"
 
 # 启用 IP 转发
 echo "启用 IP 转发..."
