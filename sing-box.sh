@@ -4,7 +4,7 @@
 BASE_URL="https://github.com/SagerNet/sing-box/releases/download"
 DEST_DIR="/root/sing-box"
 BIN_DIR="/usr/bin"
-SERVICE_FILE="/etc/systemd/system/sing-box@.service"
+SERVICE_FILE="/etc/systemd/system/sing-box@tun.service"
 CONFIG_DIR="/etc/sing-box"
 CONFIG_FILE="$CONFIG_DIR/tun.json"
 
