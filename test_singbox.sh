@@ -13,6 +13,8 @@ BIN_DIR="/usr/bin"
 CONFIG_DIR="/etc/sing-box"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 SERVICE_FILE="/etc/systemd/system/sing-box.service"
+SCRIPT_PATH="/usr/local/bin/singbox.sh"
+SCRIPT_LINK="/usr/local/bin/singbox"
 
 # 订阅转换基础URL
 CONVERT_BASE_URL="https://singbox.woaiboluo.monster/config/"
@@ -26,6 +28,19 @@ elif [[ "$ARCH" == "x86_64" ]]; then
 else
   echo "不支持的架构: $ARCH"
   exit 1
+fi
+
+# 检查快捷命令是否已存在
+if [ "$0" != "$SCRIPT_LINK" ]; then
+  echo "创建快捷命令 'singbox'..."
+  sudo tee "$SCRIPT_PATH" > /dev/null << 'EOF'
+#!/bin/bash
+exec /usr/local/bin/singbox.sh
+EOF
+  sudo chmod +x "$SCRIPT_PATH"
+  sudo ln -sf "$SCRIPT_PATH" "$SCRIPT_LINK"
+  echo "快捷命令 'singbox' 已创建。请重新运行该命令。"
+  exit 0
 fi
 
 # 检查 Go 版本
