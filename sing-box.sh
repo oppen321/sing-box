@@ -6,7 +6,7 @@ DEST_DIR="/root/sing-box"
 BIN_DIR="/usr/bin"
 SERVICE_FILE="/etc/systemd/system/sing-box.service"
 CONFIG_DIR="/etc/sing-box"
-CONFIG_FILE="$CONFIG_DIR/config.json"
+CONFIG_FILE="$CONFIG_DIR/tun.json"
 
 # 定义订阅转换基础URL
 CONVERT_BASE_URL="https://singbox.woaiboluo.monster/config/"
@@ -109,8 +109,8 @@ After=network.target nss-lookup.target network-online.target
 [Service]
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_SYS_PTRACE CAP_DAC_READ_SEARCH
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_SYS_PTRACE CAP_DAC_READ_SEARCH
-ExecStart=/usr/bin/sing-box -D /var/lib/sing-box -C /etc/sing-box run
-ExecReload=/bin/kill -HUP \$MAINPID
+ExecStart=/usr/bin/sing-box -D /var/lib/sing-box-%i -c /etc/sing-box/%i.json run
+ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 RestartSec=10s
 LimitNOFILE=infinity
@@ -124,16 +124,16 @@ echo "重新加载systemd服务..."
 systemctl daemon-reload
 
 # 启用sing-box服务
-echo "启用sing-box服务..."
-systemctl enable sing-box.service
+echo "启用sing-box@tun.service..."
+systemctl enable sing-box@tun.service
 
 # 提示用户是否立即启动服务
-read -p "是否现在启动sing-box服务？(y/n): " START_NOW
+read -p "是否现在启动sing-box@tun.service？(y/n): " START_NOW
 if [ "$START_NOW" == "y" ]; then
-  systemctl start sing-box.service
-  echo "sing-box服务已启动。"
+  systemctl start sing-box@tun.service
+  echo "sing-box@tun.service 服务已启动。"
 else
-  echo "sing-box服务已启用，但尚未启动。"
+  echo "sing-box@tun.service 服务已启用，但尚未启动。"
 fi
 
 # 显示完成信息
