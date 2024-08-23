@@ -128,7 +128,7 @@ systemctl enable sing-box.service
 # 提示用户是否立即启动服务
 read -p "是否现在启动sing-box.service？(y/n): " START_NOW
 if [ "$START_NOW" == "y" ]; then
-  systemctl start sing-box@tun.service
+  systemctl start sing-box.service
   echo "sing-box.service 服务已启动。"
 else
   echo "sing-box.service 服务已启用，但尚未启动。"
